@@ -102,10 +102,8 @@ MYSQL_PLUGIN_ACTIONS(xtradb,  [
               [Define to 1 if compiler provides atomic builtins.])
   fi
 
-  AC_MSG_CHECKING(whether GCC 64-bit atomic builtins are available)
-  # either define HAVE_IB_GCC_ATOMIC_BUILTINS_64 or not
-  AC_TRY_RUN(
-    [
+  AC_CACHE_CHECK([whether GCC 64-bit atomic builtins are available],
+		 [mysql_cv_gcc_atomic_builtins_64], [AC_TRY_RUN([
       #include <stdint.h>
       int main()
       {
@@ -127,16 +125,14 @@ MYSQL_PLUGIN_ACTIONS(xtradb,  [
 
 	return(0);
       }
-    ],
-    [
-      AC_DEFINE([HAVE_IB_GCC_ATOMIC_BUILTINS_64], [1],
-                [GCC 64-bit atomic builtins are available])
-      AC_MSG_RESULT(yes)
-    ],
-    [
-      AC_MSG_RESULT(no)
-    ]
-  )
+    ], [mysql_cv_gcc_atomic_builtins_64=yes],
+       [mysql_cv_gcc_atomic_builtins_64=no],
+       [mysql_cv_gcc_atomic_builtins_64=no])])
+
+  if test "x$mysql_cv_gcc_atomic_builtins_64" = xyes; then
+    AC_DEFINE(HAVE_IB_GCC_ATOMIC_BUILTINS_64, 1,
+              [Define to 1 if compiler provides atomic builtins.])
+  fi
 
 
   AC_CACHE_CHECK([whether pthread_t can be used by GCC atomic builtins],
