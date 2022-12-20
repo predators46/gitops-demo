@@ -42,8 +42,8 @@ static char *handlersocket_plain_secret = 0;
 static char *handlersocket_plain_secret_wr = 0;
 
 struct daemon_handlersocket_data {
-  hstcpsvr_ptr hssvr_rd;
-  hstcpsvr_ptr hssvr_wr;
+  const hstcpsvr_ptr hssvr_rd;
+  const hstcpsvr_ptr hssvr_wr;
 };
 
 static int
