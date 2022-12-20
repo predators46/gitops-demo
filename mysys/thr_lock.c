@@ -137,7 +137,7 @@ static inline pthread_cond_t *get_cond(void)
 */
 
 
-inline int LOCK_CMP(THR_LOCK_DATA *A, THR_LOCK_DATA *B)
+static inline int LOCK_CMP(THR_LOCK_DATA *A, THR_LOCK_DATA *B)
 {
   if (A->lock != B->lock)
     return A->lock < B->lock;
