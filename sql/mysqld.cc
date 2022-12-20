@@ -744,9 +744,7 @@ char *opt_logname, *opt_slow_logname;
 /* Static variables */
 
 static volatile sig_atomic_t kill_in_progress;
-#ifdef HAVE_STACKTRACE
 my_bool opt_stack_trace;
-#endif /* HAVE_STACKTRACE */
 my_bool opt_expect_abort= 0;
 static my_bool opt_bootstrap, opt_myisam_log;
 static int cleanup_done;
