@@ -1,15 +1,5 @@
 cmake_bool = $(patsubst %,-D%:BOOL=$(if $($(1)),ON,OFF),$(2))
 
-PKG_USE_NINJA ?= 1
-HOST_USE_NINJA ?= 1
-ifeq ($(PKG_USE_NINJA),1)
-  PKG_BUILD_PARALLEL ?= 1
-endif
-ifeq ($(HOST_USE_NINJA),1)
-  HOST_BUILD_PARALLEL ?= 1
-endif
-PKG_INSTALL:=1
-
 ifneq ($(findstring c,$(OPENWRT_VERBOSE)),)
   MAKE_FLAGS+=VERBOSE=1
   HOST_MAKE_FLAGS+=VERBOSE=1
@@ -53,34 +43,6 @@ CMAKE_FIND_ROOT_PATH:=$(STAGING_DIR)/usr;$(TOOLCHAIN_DIR)$(if $(CONFIG_EXTERNAL_
 CMAKE_HOST_FIND_ROOT_PATH:=$(STAGING_DIR)/host;$(STAGING_DIR_HOSTPKG);$(STAGING_DIR_HOST)
 CMAKE_SHARED_LDFLAGS:=-Wl,-Bsymbolic-functions
 CMAKE_HOST_INSTALL_PREFIX = $(HOST_BUILD_PREFIX)
-
-ifeq ($(HOST_USE_NINJA),1)
-  CMAKE_HOST_OPTIONS += -DCMAKE_GENERATOR="Ninja"
-
-  define Host/Compile/Default
-	+$(NINJA) -C $(HOST_CMAKE_BINARY_DIR) $(1)
-  endef
-
-  define Host/Install/Default
-	+$(NINJA) -C $(HOST_CMAKE_BINARY_DIR) install
-  endef
-
-  define Host/Uninstall/Default
-	+$(NINJA) -C $(HOST_CMAKE_BINARY_DIR) uninstall
-  endef
-endif
-
-ifeq ($(PKG_USE_NINJA),1)
-  CMAKE_OPTIONS += -DCMAKE_GENERATOR="Ninja"
-
-  define Build/Compile/Default
-	+$(NINJA) -C $(CMAKE_BINARY_DIR) $(1)
-  endef
-
-  define Build/Install/Default
-	+DESTDIR="$(PKG_INSTALL_DIR)" $(NINJA) -C $(CMAKE_BINARY_DIR) install
-  endef
-endif
 
 define Build/Configure/Default
 	mkdir -p $(CMAKE_BINARY_DIR)
