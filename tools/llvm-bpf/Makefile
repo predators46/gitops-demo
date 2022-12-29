@@ -18,8 +18,8 @@ HOST_BUILD_DIR:=$(BUILD_DIR_HOST)/$(PKG_NAME)-$(PKG_VERSION).src
 
 HOST_BUILD_PARALLEL:=1
 
-CMAKE_BINARY_SUBDIR := build
-CMAKE_SOURCE_SUBDIR := llvm
+CMAKE_BINARY_DIR := build
+CMAKE_SOURCE_DIR := llvm
 
 include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/cmake.mk
