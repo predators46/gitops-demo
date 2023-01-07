@@ -36,10 +36,11 @@ openssl_env * initssl() {
     if (openssl_init == 0) {
       openssl_init = 1;
 #ifdef HAVE_OPENSSL
+      if (_options.debug) {
+	SSL_load_error_strings();
+      }
       SSL_library_init();
-      if (_options.debug) SSL_load_error_strings();
-      SSLeay_add_all_algorithms();
-      SSLeay_add_ssl_algorithms();
+      OpenSSL_add_all_algorithms();
 #else
       matrixSslOpen();
       log_dbg("MatrixSslOpen()");
@@ -55,10 +56,11 @@ openssl_env * initssl_cli() {
     if (openssl_init == 0) {
       openssl_init = 1;
 #ifdef HAVE_OPENSSL
+      if (_options.debug) {
+	SSL_load_error_strings();
+      }
       SSL_library_init();
-      if (_options.debug) SSL_load_error_strings();
-      SSLeay_add_all_algorithms();
-      SSLeay_add_ssl_algorithms();
+      OpenSSL_add_all_algorithms();
 #else
       matrixSslOpen();
       log_dbg("MatrixSslOpen()");
@@ -106,16 +108,7 @@ openssl_use_privatekey(openssl_env *env, char *file) {
       return 1;
   }
   log_err(errno, "could not load private key file %s (%d,%d)\n",file,err1,err2);
-  /*
-    {
-    BIO *bio_err = NULL;
-    bio_err = BIO_new_fp(stderr, BIO_NOCLOSE);
-    BIO_printf(bio_err,"unable to set private key file\n");
-    #if(_debug_)
-    ERR_print_errors(bio_err);
-    #endif
-    }
-  */
+  
   return 0;
 }
 
@@ -126,74 +119,6 @@ openssl_cacert_location(openssl_env *env, char *file, char *dir) {
     log_err(errno, "unable to load CA certificates.\n");
   return err;
 }
-
-#if(0)
-static RSA *
-openssl_tmpRSA_cb(SSL *ssl, int export, int len) {
-  openssl_con *con = (openssl_con *)SSL_get_app_data(ssl);
-  openssl_env *env = con->env;
-  RSA *rsa = 0;
-
-  if (export) {
-    /* an export cipher is being used */
-    if (len == 512)
-      rsa = (RSA *)env->tmpKeys[OPENSSL_TMPKEY_RSA512];
-    else if (len == 1024)
-      rsa = (RSA *)env->tmpKeys[OPENSSL_TMPKEY_RSA1024];
-    else
-      /* too expensive to generate on-the-fly, use 1024bit */
-      rsa = (RSA *)env->tmpKeys[OPENSSL_TMPKEY_RSA1024];
-  }
-  else {
-    /* sign-only certificate situation exists */
-    rsa = (RSA *)env->tmpKeys[OPENSSL_TMPKEY_RSA1024];
-  }
-  return rsa;
-}
-
-static DH *
-openssl_tmpDH_cb(SSL *ssl, int export, int len) {
-  openssl_con *con = (openssl_con *)SSL_get_app_data(ssl);
-  openssl_env *env = con->env;
-  DH *dh = 0;
-
-  if (export) {
-    /* an export cipher is being used */
-    if (len == 512)
-      dh = (DH *)env->tmpKeys[OPENSSL_TMPKEY_DH512];
-    else if (len == 1024)
-      dh = (DH *)env->tmpKeys[OPENSSL_TMPKEY_DH1024];
-    else
-      /* too expensive to generate on-the-fly, use 1024bit */
-      dh = (DH *)env->tmpKeys[OPENSSL_TMPKEY_DH1024];
-  }
-  else {
-    /* sign-only certificate situation exists */
-    dh = (DH *)env->tmpKeys[OPENSSL_TMPKEY_DH1024];
-  }
-  return dh;
-}
-
-static void
-openssl_tmp_genkeys(openssl_env *env) {
-
-  if ((env->tmpKeys[OPENSSL_TMPKEY_RSA512] = RSA_generate_key(512, RSA_F4, NULL, NULL)) == NULL) {
-    log_err(errno, "could not generate tmp 512bit RSA key\n");
-  }
-
-  if ((env->tmpKeys[OPENSSL_TMPKEY_RSA1024] = RSA_generate_key(1024, RSA_F4, NULL, NULL)) == NULL) {
-    log_err(errno, "could not generate tmp 1024bit RSA key\n");
-  }
-
-  if ((env->tmpKeys[OPENSSL_TMPKEY_DH512] = openssl_dh_tmpkey(512)) == NULL) {
-    log_err(errno, "could not generate tmp 512bit DH key\n");
-  }
-
-  if ((env->tmpKeys[OPENSSL_TMPKEY_DH1024] = openssl_dh_tmpkey(1024)) == NULL) {
-    log_err(errno, "could not generate tmp 512bit DH key\n");
-  }
-}
-#endif
 
 int
 _openssl_env_init(openssl_env *env, char *engine, int server) {
