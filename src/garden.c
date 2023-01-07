@@ -110,7 +110,7 @@ void garden_print(int fd) {
     patricia_process(dhcp->ptree, cb);
   } else 
 #endif
-    garden_print_list(fd, 
+  garden_print_list(fd, 
 		      _options.pass_throughs, 
 		      _options.num_pass_throughs);
 
@@ -125,7 +125,7 @@ void garden_print(int fd) {
     patricia_process(dhcp->ptree_dyn, cb);
   } else 
 #endif
-    garden_print_list(fd, 
+  garden_print_list(fd, 
 		      dhcp->pass_throughs, 
 		      dhcp->num_pass_throughs);
 
