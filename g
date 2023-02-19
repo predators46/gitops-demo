@@ -1,8 +1,14 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Copyright (C) 2023 Luca Barbato and Donald Hoskins
+
 # Rust Environmental Vars
 CONFIG_HOST_SUFFIX:=$(shell cut -d"-" -f4 <<<"$(GNU_HOST_NAME)")
 RUSTC_HOST_ARCH:=$(HOST_ARCH)-unknown-linux-$(CONFIG_HOST_SUFFIX)
-RUSTC_TARGET_ARCH:=$(REAL_GNU_TARGET_NAME)
-CARGO_HOME:=$(STAGING_DIR_HOST)
+CARGO_HOME:=$(STAGING_DIR_HOST)/cargo
+
+# Support only a subset for now.
+RUST_ARCH_DEPENDS:=@(aarch64||mips||mipsel||mips64||mips64el||mipsel||powerpc64)
 
 # Common Build Flags
 RUST_BUILD_FLAGS = \
@@ -10,6 +16,15 @@ RUST_BUILD_FLAGS = \
 
 # This adds the rust environmental variables to Make calls
 MAKE_FLAGS += $(RUST_BUILD_FLAGS)
+
+# mips64 openwrt has a specific targed in rustc
+ifeq ($(ARCH),"mips64")
+  RUSTC_TARGET_ARCH:=$(REAL_GNU_TARGET_NAME)
+else
+  RUSTC_TARGET_ARCH:=$(subst openwrt,unknown,$(REAL_GNU_TARGET_NAME))
+endif
+
+RUSTC_TARGET_ARCH:=$(subst muslgnueabi,musleabi,$(RUSTC_TARGET_ARCH))
 
 # ARM Logic
 ifeq ($(ARCH),"arm")
